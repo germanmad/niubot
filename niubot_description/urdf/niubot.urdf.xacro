@@ -1,0 +1,317 @@
+<?xml version="1.0" ?>
+<robot name="niubot" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find niubot_description)/urdf/common_properties.xacro"/>
+  <xacro:include filename="$(find niubot_description)/urdf/niubot.gazebo.xacro"/>
+
+  <link name="base_footprint" >
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+  </joint>
+
+  <!-- BASE-LINK -->
+  <!--Actual body/chassis of the robot-->
+  <link name="base_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://niubot_description/meshes/niubot_body.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0 " xyz="0 0 0"/>
+      <geometry>
+        <box size="0.21 0.178 0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="4.4"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+<!-- LEFT WHEEL -->
+  <joint name="wheel_right_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_right_link"/>
+    <origin rpy="0 0 3.1415926" xyz="0 0 0"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
+    <limit effort="30" velocity="1.0" lower="-2.2" upper="0.7" />
+    <safety_controller k_velocity="10" k_position="15" soft_lower_limit="-2.0" soft_upper_limit="0.5" />
+  </joint>
+
+  <transmission name="right_wheel_joint_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="right_wheel_joint" />
+    <actuator name="right_wheel_joint_motor">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <link name="wheel_right_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://niubot_description/meshes/niubot_wheel.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0 " xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.02" radius="0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <origin xyz="0 0 0"/>
+      <!--The 3x3 rotational inertia matrix. -->
+      <inertia ixx="0.0082916666667" ixy="0" ixz="0" iyy="0.00282916666667" iyz="0" izz="0.005625"/>
+    </inertial>
+  </link>
+
+<!-- LEFT WHEEL -->
+  <joint name="wheel_left_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_left_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis rpy="0 0 0" xyz="0 0 1"/>
+    <limit effort="30" velocity="1.0" lower="-2.2" upper="0.7" />
+    <safety_controller k_velocity="10" k_position="15" soft_lower_limit="-2.0" soft_upper_limit="0.5" />
+  </joint>
+
+    <transmission name="left_wheel_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="left_wheel_joint" />
+      <actuator name="left_wheel_joint_motor">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+  <link name="wheel_left_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://niubot_description/meshes/niubot_wheel.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0 " xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.02" radius="0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <origin xyz="0 0 0"/>
+      <!--The 3x3 rotational inertia matrix. -->
+      <inertia ixx="0.0082916666667" ixy="0" ixz="0" iyy="0.00282916666667" iyz="0" izz="0.005625"/>
+    </inertial>
+  </link>
+
+  <!-- SERVO_CAMERA -->
+
+  <joint name="servo_camera_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="servo_camera_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
+    <limit effort="30" velocity="1.0" lower="-2.2" upper="0.7" />
+    <safety_controller k_velocity="10" k_position="15" soft_lower_limit="-2.0" soft_upper_limit="0.5" />
+  </joint>
+
+  <!-- Transmission is important to link the joints and the controller -->
+    <transmission name="servo_camera_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="servo_camera_joint" />
+      <actuator name="servo_camera_joint_motor">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+  <link name="servo_camera_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0.068 0 0.044"/>
+      <geometry>
+        <mesh filename="package://niubot_description/meshes/niubot_camera.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0 " xyz="0.068 0 0.044"/>
+      <geometry>
+        <cylinder length="0.02" radius="0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.2"/>
+      <origin xyz="0 0 0"/>
+      <!--The 3x3 rotational inertia matrix. -->
+      <inertia ixx="0.0082916666667" ixy="0" ixz="0" iyy="0.00282916666667" iyz="0" izz="0.005625"/>
+    </inertial>
+  </link>
+
+
+  <!-- CAMERA -->
+  <joint name="camera_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.08 0 0.079"/>
+    <parent link="servo_camera_link"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <link name="camera_link">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+  </link>
+
+
+  <!-- CEIL LASER -->
+  <joint name="ceil_joint" type="fixed">
+    <axis xyz="0 1 0"/>
+    <origin rpy="0 -1.57079 0" xyz="-0.0759 0 0.0867"/>
+    <parent link="base_link"/>
+    <child link="ceil_link"/>
+  </joint>
+
+  <link name="ceil_link">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <mass value="1e-5"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+
+  <!-- SHARP IR_L -->
+  <joint name="ir_l_joint" type="fixed">
+    <axis xyz="0 1 0"/>
+    <origin rpy="0 0 0.174533" xyz="0.102 0.025 0.004"/>
+    <parent link="base_link"/>
+    <child link="ir_l_link"/>
+  </joint>
+
+  <link name="ir_l_link">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <mass value="1e-5"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+
+  <!-- SHARP IR_R -->
+  <joint name="ir_r_joint" type="fixed">
+    <axis xyz="0 1 0"/>
+    <origin rpy="0 0 -0.174533" xyz="0.102 -0.025 0.004"/>
+    <parent link="base_link"/>
+    <child link="ir_r_link"/>
+  </joint>
+
+  <link name="ir_r_link">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <mass value="1e-5"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+
+  <!-- IMU -->
+  <joint name="imu_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.069 0 0.032"/>
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+  </joint>
+
+  <link name="imu_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.02 0.008"/>
+      </geometry>
+    </visual>
+    </link>
+
+ <!-- LIDAR -->
+  <joint name="scan_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_scan"/>
+    <origin xyz="-0.027 0 0.131401" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_scan">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.028" radius="0.033"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.028" radius="0.033"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.114" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" />
+    </inertial>
+  </link>
+
+</robot>

@@ -1,0 +1,379 @@
+<?xml version="1.0"?>
+<robot name="niubot_sim" xmlns:xacro="http://ros.org/wiki/xacro">
+
+<xacro:arg name="laser_visual" default="false"/>
+<xacro:arg name="camera_visual" default="false"/>
+<xacro:arg name="imu_visual"   default="false"/>
+
+<gazebo reference="base_link">
+  <material>Gazebo/White</material>
+</gazebo>
+
+<gazebo reference="wheel_left_link">
+  <mu1>0.1</mu1>
+  <mu2>0.1</mu2>
+  <kp>500000.0</kp>
+  <kd>10.0</kd>
+  <minDepth>0.001</minDepth>
+  <maxVel>0.1</maxVel>
+  <fdir1>1 0 0</fdir1>
+  <material>Gazebo/Orange</material>
+</gazebo>
+
+<gazebo reference="wheel_right_link">
+  <mu1>0.1</mu1>
+  <mu2>0.1</mu2>
+  <kp>500000.0</kp>
+  <kd>10.0</kd>
+  <minDepth>0.001</minDepth>
+  <maxVel>0.1</maxVel>
+  <fdir1>1 0 0</fdir1>
+  <material>Gazebo/Orange</material>
+</gazebo>
+
+<gazebo reference="caster_back_link">
+  <mu1>0.1</mu1>
+  <mu2>0.1</mu2>
+  <kp>1000000.0</kp>
+  <kd>100.0</kd>
+  <minDepth>0.001</minDepth>
+  <maxVel>1.0</maxVel>
+  <material>Gazebo/Grey</material>
+</gazebo>
+
+<gazebo reference="imu_link">
+  <sensor type="imu" name="imu">
+    <always_on>true</always_on>
+    <visualize>$(arg imu_visual)</visualize>
+  </sensor>
+</gazebo>
+
+<gazebo reference="base_footprint">
+  <material>Gazebo/Orey</material>
+</gazebo>
+
+
+  <!-- SENSORS -->
+  <!-- CAMERA -->
+<gazebo reference="camera_link">
+  <turnGravityOff>false</turnGravityOff>
+  <material>Gazebo/Blue</material>
+  <sensor type="camera" name="camera">
+    <update_rate>10.0</update_rate>
+    <camera name="head">
+      <horizontal_fov>1.3962634</horizontal_fov>
+      <image>
+        <width>800</width>
+        <height>800</height>
+        <format>R8G8B8</format>
+      </image>
+      <clip>
+        <near>0.02</near>
+        <far>300</far>
+      </clip>
+      <noise>
+        <type>gaussian</type>
+        <!-- Noise is sampled independently per pixel on each frame.
+             That pixel's noise value is added to each of its color
+             channels, which at that point lie in the range [0,1]. -->
+        <mean>0.0</mean>
+        <stddev>0.007</stddev>
+      </noise>
+    </camera>
+    <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>0.0</updateRate>
+      <cameraName>niubot/camera</cameraName>
+      <imageTopicName>image_raw</imageTopicName>
+      <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+      <frameName>camera_link</frameName>
+      <hackBaseline>0.07</hackBaseline>
+      <distortionK1>0.0</distortionK1>
+      <distortionK2>0.0</distortionK2>
+      <distortionK3>0.0</distortionK3>
+      <distortionT1>0.0</distortionT1>
+      <distortionT2>0.0</distortionT2>
+    </plugin>
+  </sensor>
+</gazebo>
+
+<!-- SONAR2 -->
+
+<gazebo reference="sonar2_link">
+  <turnGravityOff>false</turnGravityOff>
+  <material>Gazebo/Orange</material>
+   <sensor type="ray" name="Sonar_2">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>5</update_rate>
+      <ray>
+       <scan>
+         <horizontal>
+           <samples>1</samples>
+           <resolution>1.0</resolution>
+           <min_angle>-0.12</min_angle>
+           <max_angle>0.12</max_angle>
+         </horizontal>
+         <vertical>
+           <samples>1</samples>
+           <resolution>1.0</resolution>
+           <min_angle>0</min_angle>
+           <max_angle>0</max_angle>
+         </vertical>
+       </scan>
+       <range>
+         <min>0.02</min>
+         <max>2.2</max>
+         <resolution>0.01</resolution>
+       </range>
+     </ray>
+      <plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range">
+         <gaussianNoise>0.005</gaussianNoise>
+         <alwaysOn>true</alwaysOn>
+         <updateRate>5</updateRate>
+         <topicName>/niubot/sonar2</topicName>
+         <frameName>sonar2_link</frameName>
+         <radiation>ULTRASOUND</radiation>
+         <fov>0.5</fov>
+      </plugin>
+   </sensor>
+   </gazebo>
+
+
+   <!-- SONAR1 -->
+
+<gazebo reference="sonar1_link">
+<turnGravityOff>false</turnGravityOff>
+<material>Gazebo/Orange</material>
+<sensor type="ray" name="Sonar_1">
+   <pose>0 0 0 0 0 0</pose>
+   <visualize>true</visualize>
+   <update_rate>5</update_rate>
+   <ray>
+    <scan>
+      <horizontal>
+        <samples>1</samples>
+        <resolution>1.0</resolution>
+        <min_angle>-0.12</min_angle>
+        <max_angle>0.12</max_angle>
+      </horizontal>
+      <vertical>
+        <samples>1</samples>
+        <resolution>1.0</resolution>
+        <min_angle>0</min_angle>
+        <max_angle>0</max_angle>
+      </vertical>
+    </scan>
+    <range>
+      <min>0.02</min>
+      <max>2.2</max>
+      <resolution>0.01</resolution>
+    </range>
+  </ray>
+   <plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range">
+      <gaussianNoise>0.005</gaussianNoise>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>5</updateRate>
+      <topicName>niubot/sonar1</topicName>
+      <frameName>sonar1_link</frameName>
+      <radiation>ULTRASOUND</radiation>
+      <fov>0.5</fov>
+   </plugin>
+</sensor>
+</gazebo>
+
+      <!-- SONAR0 -->
+<gazebo reference="sonar0_link">
+<turnGravityOff>false</turnGravityOff>
+<material>Gazebo/Orange</material>
+ <sensor type="ray" name="Sonar_0">
+    <pose>0 0 0 0 0 0</pose>
+    <visualize>true</visualize>
+    <update_rate>5</update_rate>
+    <ray>
+     <scan>
+       <horizontal>
+         <samples>1</samples>
+         <resolution>1.0</resolution>
+         <min_angle>-0.07</min_angle>
+         <max_angle>0.07</max_angle>
+       </horizontal>
+       <vertical>
+         <samples>1</samples>
+         <resolution>1.0</resolution>
+         <min_angle>-0.07</min_angle>
+         <max_angle>0.07</max_angle>
+       </vertical>
+     </scan>
+     <range>
+       <min>0.02</min>
+       <max>2.2</max>
+       <resolution>0.01</resolution>
+     </range>
+   </ray>
+    <plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range">
+       <gaussianNoise>0.005</gaussianNoise>
+       <alwaysOn>true</alwaysOn>
+       <updateRate>5</updateRate>
+       <topicName>niubot/sonar0</topicName>
+       <frameName>sonar0_link</frameName>
+       <radiation>ULTRASOUND</radiation>
+       <fov>0.5</fov>
+    </plugin>
+ </sensor>
+ </gazebo>
+
+         <!-- SONAR3 -->
+<gazebo reference="sonar3_link">
+ <turnGravityOff>false</turnGravityOff>
+ <material>Gazebo/Orange</material>
+  <sensor type="ray" name="Sonar_3">
+     <pose>0 0 0 0 0 0</pose>
+     <visualize>true</visualize>
+     <update_rate>5</update_rate>
+     <ray>
+      <scan>
+        <horizontal>
+          <samples>1</samples>
+          <resolution>1.0</resolution>
+          <min_angle>-0.07</min_angle>
+          <max_angle>0.07</max_angle>
+        </horizontal>
+        <vertical>
+          <samples>1</samples>
+          <resolution>1.0</resolution>
+          <min_angle>-0.07</min_angle>
+          <max_angle>0.07</max_angle>
+        </vertical>
+      </scan>
+      <range>
+        <min>0.02</min>
+        <max>2.2</max>
+        <resolution>0.01</resolution>
+      </range>
+    </ray>
+     <plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range">
+        <gaussianNoise>0.005</gaussianNoise>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>5</updateRate>
+        <topicName>niubot/sonar3</topicName>
+        <frameName>sonar3_link</frameName>
+        <radiation>ULTRASOUND</radiation>
+        <fov>0.5</fov>
+     </plugin>
+  </sensor>
+  </gazebo>
+
+
+  <gazebo reference="sonar4_link">
+    <turnGravityOff>false</turnGravityOff>
+    <material>Gazebo/Orange</material>
+     <sensor type="ray" name="Sonar_4">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>true</visualize>
+        <update_rate>5</update_rate>
+        <ray>
+         <scan>
+           <horizontal>
+             <samples>1</samples>
+             <resolution>1.0</resolution>
+             <min_angle>-0.07</min_angle>
+             <max_angle>0.07</max_angle>
+           </horizontal>
+           <vertical>
+             <samples>1</samples>
+             <resolution>1.0</resolution>
+             <min_angle>-0.07</min_angle>
+             <max_angle>0.07</max_angle>
+           </vertical>
+         </scan>
+         <range>
+           <min>0.02</min>
+           <max>2.2</max>
+           <resolution>0.01</resolution>
+         </range>
+       </ray>
+        <plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range">
+           <gaussianNoise>0.005</gaussianNoise>
+           <alwaysOn>true</alwaysOn>
+           <updateRate>5</updateRate>
+           <topicName>niubot/sonar4</topicName>
+           <frameName>sonar4_link</frameName>
+           <radiation>ULTRASOUND</radiation>
+           <fov>0.5</fov>
+        </plugin>
+     </sensor>
+   </gazebo>
+
+  <!-- IMU -->
+  <gazebo reference="imu_link">
+     <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+       <alwaysOn>true</alwaysOn>
+       <bodyName>base_footprint</bodyName>
+       <topicName>/imu</topicName>
+       <serviceName>imu_service</serviceName>
+       <gaussianNoise>0.0</gaussianNoise>
+       <updateRate>20.0</updateRate>
+     </plugin>
+   </gazebo>
+
+
+<!-- LIDAR -->
+ <gazebo reference="base_scan">
+   <material>Gazebo/FlatBlack</material>
+   <sensor type="ray" name="lds_lfcd_sensor">
+     <pose>0 0 0 0 0 0</pose>
+     <visualize>$(arg laser_visual)</visualize>
+     <update_rate>5</update_rate>
+     <ray>
+       <scan>
+         <horizontal>
+           <samples>360</samples>
+           <resolution>1</resolution>
+           <min_angle>0.0</min_angle>
+           <max_angle>6.28319</max_angle>
+         </horizontal>
+       </scan>
+       <range>
+         <min>0.120</min>
+         <max>3.5</max>
+         <resolution>0.015</resolution>
+       </range>
+       <noise>
+         <type>gaussian</type>
+         <mean>0.0</mean>
+         <stddev>0.01</stddev>
+       </noise>
+     </ray>
+     <plugin name="gazebo_ros_lds_lfcd_controller" filename="libgazebo_ros_laser.so">
+       <topicName>scan</topicName>
+       <frameName>base_scan</frameName>
+     </plugin>
+   </sensor>
+ </gazebo>
+
+  <!-- Differential drive controller  -->
+  <gazebo>
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <odometrySource>world</odometrySource>
+      <publishOdomTF>true</publishOdomTF>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+      <publishWheelTF>true</publishWheelTF>
+      <publishTf>true</publishTf>
+      <publishWheelJointState>true</publishWheelJointState>
+      <legacyMode>false</legacyMode>
+      <updateRate>5</updateRate>
+      <leftJoint>wheel_left_joint</leftJoint>
+      <rightJoint>wheel_right_joint</rightJoint>
+      <wheelSeparation>0.1634</wheelSeparation>
+      <wheelDiameter>0.06</wheelDiameter>
+      <wheelAcceleration>1</wheelAcceleration>
+      <wheelTorque>10</wheelTorque>
+      <rosDebugLevel>na</rosDebugLevel>
+    </plugin>
+  </gazebo>
+
+</robot>
