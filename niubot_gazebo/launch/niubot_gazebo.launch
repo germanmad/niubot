@@ -16,7 +16,7 @@
   </include>
 
   <!-- urdf xml robot description loaded on the Parameter Server-->
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find niubot_description)/urdf/niubot.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro '$(find niubot_description)/urdf/niubot.urdf.xacro'" />
 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"></node>
 
