@@ -7,7 +7,7 @@
   <arg name="debug" default="false"/>
 
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  <include file="$(find niubot_gazebo)/launch/turtlebot3_world.launch">
     <arg name="debug" value="$(arg debug)" />
     <arg name="gui" value="$(arg gui)" />
     <arg name="paused" value="$(arg paused)"/>
