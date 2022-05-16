@@ -1,0 +1,77 @@
+<launch>
+  <!-- urdf xml robot description loaded on the Parameter Server-->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find niubot_description)/urdf/niubot.urdf'" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+    <param name="publish_frequency" type="double" value="5.0" />
+  </node>
+
+  <arg name="enable_raw" default="false"/>
+  <arg name="enable_imv" default="false"/>
+  <arg name="camera_id" default="0"/>
+  <arg name="camera_frame_id" default="camera_link"/>
+  <arg name="camera_name" default="camerav2_410x308"/>
+
+  <node type="raspicam_node" pkg="raspicam_node" name="raspicam_node" output="screen">
+    <param name="private_topics" value="true"/>
+
+    <param name="camera_frame_id" value="$(arg camera_frame_id)"/>
+    <param name="enable_raw" value="$(arg enable_raw)"/>
+    <param name="enable_imv" value="$(arg enable_imv)"/>
+    <param name="camera_id" value="$(arg camera_id)"/>
+
+    <param name="camera_info_url" value="package://raspicam_node/camera_info/camerav2_410x308.yaml"/>
+    <param name="camera_name" value="$(arg camera_name)"/>
+    <param name="width" value="410"/>
+    <param name="height" value="308"/>
+
+    <param name="framerate" value="5"/>
+    <param name="exposure_mode" value="antishake"/>
+    <param name="shutter_speed" value="0"/>
+
+    <remap from="/raspicam_node/camera_info" to="/niubot/camera/camera_info" />
+    <remap from="/raspicam_node/image/compressed" to="/niubot/camera/image_raw/compressed"/>
+    <remap from="/raspicam_node/parameter_descriptions" to="/niubot/camera/image_raw/compressed/parameter_descriptions"/>
+    <remap from="/raspicam_node/parameter_updates" to="/niubot/camera/image_raw/compressed/parameter_updates"/>
+  </node>
+
+  <node name="niubot_node" pkg="niubot_core" type="NiubotBringUp_pid.py" output="screen" />
+
+  <node name="right_wheel_pid" pkg="pid" type="controller">
+    <param name="ns" value="wheel_right" />
+    <param name="Kp" value="5.3" />
+    <param name="Ki" value="0.0" />
+    <param name="Kd" value="0.1" />
+    <param name="upper_limit" value="1.0" />
+    <param name="lower_limit" value="-1.0" />
+    <param name="max_loop_frequency" value="100.0" />
+    <param name="min_loop_frequency" value="100.0" />
+    <remap from="setpoint" to="/niubot/wheel_right/setpoint" />
+  </node>
+
+  <node name="state_right_node" pkg="pid" type="plant_sim" ns="/niubot/wheel_right" output="screen" >
+      <param name="plant_order" value="2" />
+      <param name="reverse_acting" value="false" />
+  </node>
+
+  <node name="left_wheel_pid" pkg="pid" type="controller">
+    <param name="ns" value="wheel_right" />
+    <param name="Kp" value="5.3" />
+    <param name="Ki" value="0.0" />
+    <param name="Kd" value="0.1" />
+    <param name="upper_limit" value="1.0" />
+    <param name="lower_limit" value="-1.0" />
+    <param name="max_loop_frequency" value="100.0" />
+    <param name="min_loop_frequency" value="100.0" />
+    <remap from="setpoint" to="/niubot/wheel_left/setpoint" />
+  </node>
+
+  <node name="state_left_node" pkg="pid" type="plant_sim" ns="/niubot/wheel_left" output="screen" >
+      <param name="plant_order" value="2" />
+      <param name="reverse_acting" value="false" />
+  </node>
+
+  <node name="niubot_tele" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" >
+    <remap from="/cmd_vel" to="/niubot/cmd_vel"/>
+  </node>
+  
+</launch>

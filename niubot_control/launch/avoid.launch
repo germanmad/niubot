@@ -1,0 +1,13 @@
+
+<launch>
+  <!-- differential_teleop_key already has its own built in velocity smoother -->
+  <node pkg="niubot_control" type="avoid_explorer.py" name="avoid_explorer"  output="screen">
+
+    <param name="vel_lin" value="0.55" type="double"/>
+    <param name="vel_ang" value="1.8" type="double"/>
+    <param name="giro_lapse" value="1.0" type="double"/>
+    <param name="avance_lapse" value="1.0" type="double"/>
+    <param name="limit" value="1.9" type="double"/>
+
+  </node>
+</launch>

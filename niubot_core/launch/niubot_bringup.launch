@@ -1,0 +1,77 @@
+<launch>
+  <!-- urdf xml robot description loaded on the Parameter Server-->
+  <param name="robot_description" command="$(find xacro)/xacro $(find niubot_description)/urdf/niubot.urdf.xacro" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+    <param name="publish_frequency" type="double" value="5.0" />
+  </node>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+
+
+  <node name="niubot_node" pkg="niubot_core" type="NiubotBringUp.py" output="screen" />
+
+  <!-- <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+    <param name="output_frame" value="odom_combined"/>
+    <param name="base_footprint_frame" value="base_footprint"/>
+    <param name="freq" value="30.0"/>
+    <param name="sensor_timeout" value="1.0"/>
+    <param name="odom_used" value="true"/>
+    <param name="imu_used" value="true"/>
+    <param name="vo_used" value="false"/>
+    <remap from="niubot/odom" to="odom" />
+  </node> -->
+  <node name="ydlidar_node"  pkg="ydlidar_ros"  type="ydlidar_node" output="screen" respawn="false" >
+    <param name="port"         type="string" value="/dev/ydlidar"/>
+    <param name="baudrate"         type="int" value="115200"/>
+    <param name="frame_id"     type="string" value="base_scan"/>
+    <param name="resolution_fixed"    type="bool"   value="true"/>
+    <param name="auto_reconnect"    type="bool"   value="true"/>
+    <param name="reversion"    type="bool"   value="false"/>
+    <param name="angle_min"    type="double" value="-180" />
+    <param name="angle_max"    type="double" value="180" />
+    <param name="range_min"    type="double" value="0.1" />
+    <param name="range_max"    type="double" value="12.0" />
+    <param name="ignore_array" type="string" value="" />
+    <param name="frequency"    type="double" value="8"/>
+    <param name="samp_rate"    type="int"    value="3"/>
+    <param name="isSingleChannel"    type="bool"   value="true"/>
+  </node>
+<!--
+  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="camera_frame_id" value="camera_link" />
+    <param name="io_method" value="mmap"/>
+  </node> -->
+  <arg name="enable_raw" default="false"/>
+    <arg name="enable_imv" default="false"/>
+    <arg name="camera_id" default="0"/>
+    <arg name="camera_frame_id" default="camera_link"/>
+    <arg name="camera_name" default="camerav2_410x308"/>
+    <!-- <arg name="camera_name" default="camerav1_410x308"/> -->
+
+    <node type="raspicam_node" pkg="raspicam_node" name="raspicam_node" output="screen">
+      <param name="private_topics" value="true"/>
+
+      <param name="camera_frame_id" value="$(arg camera_frame_id)"/>
+      <param name="enable_raw" value="$(arg enable_raw)"/>
+      <param name="enable_imv" value="$(arg enable_imv)"/>
+      <param name="camera_id" value="$(arg camera_id)"/>
+
+      <param name="camera_info_url" value="$(find raspicam_node)/camera_info/camerav2_410x308.yaml"/>
+      <param name="camera_name" value="$(arg camera_name)"/>
+      <param name="width" value="410"/>
+      <param name="height" value="308"/>
+
+      <param name="framerate" value="5"/>
+      <param name="exposure_mode" value="antishake"/>
+      <param name="shutter_speed" value="0"/>
+    </node>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser"
+    args="-0.05 0 0.138 0.0 0.0 0.0 /base_link /base_scan 10" /> -->
+    <node name="niubot_tele" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen"/>
+
+
+</launch>
